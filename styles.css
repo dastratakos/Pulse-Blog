@@ -1,0 +1,195 @@
+html,
+body {
+  font-family: "Avenir Next";
+  margin: 0;
+}
+
+h1 {
+  font-size: 4rem;
+  font-weight: 600;
+  margin-top: 0;
+}
+
+h2 {
+  font-weight: normal;
+  font-size: larger;
+}
+
+h3 {
+  margin-top: 50px;
+}
+
+h4 {
+  margin: 0;
+}
+
+p {
+  font-size: larger;
+  text-align: justify;
+}
+
+a {
+  text-decoration: none;
+}
+
+code {
+  background-color: #F3EFE0;
+  border-radius: 3px;
+  font-family: courier, monospace;
+  padding: 0 3px;
+}
+
+.header {
+  margin-bottom: 50px;
+  background-color: #f2c17d;
+  background-image: linear-gradient(315deg, #f2c17d 0%, #b82e1f 74%);
+  color: #F3EFE0;
+}
+
+.nav {
+  max-width: 1470px;
+  margin: auto;
+  padding-top: 20px;
+  text-align: center;
+  font-size: larger;
+}
+
+.nav-link {
+  color: #F3EFE0;
+}
+
+.hero {
+  padding: 30px;
+  padding-top: 80px;
+  margin: auto;
+  max-width: 1470px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.hero-text {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hero-text-title-description {
+  width: 75%;
+  text-align: justify;
+}
+
+.hero-text-footer {
+  width: 75%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.hero-name {
+  margin: 0;
+  font-size: x-large;
+}
+
+.hero-text-date {
+  text-align: end;
+}
+
+.hero-text-date-item {
+  margin: 0;
+  text-align: end;
+}
+
+#header-img {
+  max-width: 50vw;
+  margin-left: 20px;
+  border-radius: 10px;
+}
+
+.container {
+  width: 90%;
+  max-width: 1470px;
+  margin: auto;
+}
+
+.btns {
+  margin-bottom: 40px;
+}
+
+.btn {
+  color: #b82e1f;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  background-color: #F3EFE0;
+  padding: 8px;
+  margin: 10px;
+  border-radius: 8px;
+}
+
+.content {
+  max-width: 50%;
+  margin-left: 25%;
+}
+
+.systems {
+  display: flex;
+  align-items: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.system {
+  flex: 1;
+  text-align: center;
+}
+
+.system-img {
+  max-width: 70%;
+  max-height: 200px;
+}
+
+.plots {
+  position: relative;
+  display: flex;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  width: 80vw;
+  transform: translateX(-20vw);
+}
+
+.plot {
+  flex: 1;
+  text-align: center;
+}
+
+.plot-img {
+  width: 100%;
+}
+
+.gif {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.reference {
+  color: black;
+}
+
+.reference:hover {
+  opacity: 0.5;
+}
+
+.footer {
+  height: 30px;
+  margin-top: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #F3EFE0;
+  background-color: #f2c17d;
+  background-image: linear-gradient(315deg, #f2c17d 0%, #b82e1f 74%);
+}

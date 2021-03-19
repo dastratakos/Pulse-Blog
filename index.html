@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>Pulse</title>
+</head>
+<body>
+  <div class="header">
+    <div class="nav">
+      <a href="https://stanford-cs329s.github.io/index.html" target="_blank" class="nav-link">
+        Stanford CS 329S: Machine Learning Systems Design
+      </a>
+    </div>
+    <div class="hero">
+      <div class="hero-text">
+        <div class="hero-text-title">
+          <h1>
+            Pulse: Enhancing
+            <br>
+            Google Search
+          </h1>
+          <h2 class="hero-text-title-description">
+            Save time when browsing Google News with Pulse! Pulse runs sentiment analysis on search results and labels articles with a visual cue to indicate positive, neutral, or negative content so you can get a high level overview of the topic before diving in.
+          </h2>
+        </div>
+        <div class="hero-text-footer">
+          <div class="hero-text-names">
+            <h2 class="hero-name">Ishan Gaur</h2>
+            <h2 class="hero-name">Charles Pan</h2>
+            <h2 class="hero-name">Dean Stratakos</h2>
+          </div>
+          <div class="hero-text-date">
+            <p class="hero-text-date-item">March 18, 2021</p>
+            <p class="hero-text-date-item">15 min read</p>
+          </div>
+        </div>
+      </div>
+      <div class="hero-img">
+        <img id="header-img" src="assets/demo.png">
+      </div>
+    </div>
+  </div>
+  <section class="container">
+    <section class="content">
+      <section class="btns">
+        <a href="assets/CS 329S Report.pdf" class="btn" target="_blank">Read paper</a>
+        <a href="https://github.com/dastratakos/Pulse" class="btn" target="_blank">View code</a>
+        <a href="https://chrome.google.com/webstore/detail/pulse/ljdiggfingojeibjcaobbafdfbbbipee/related" class="btn" target="_blank">Find it online</a>
+      </section>
+      
+      <!-- ============= Problem Definition ============= -->
+      <h3>Problem Definition</h3>
+      <p>
+        Writing long essays and research papers is an essential part of a student’s everyday life. The average college student writes 10-15 papers per semester, or around 40-60 pages. Most of the time dedicated to these papers is spent conducting research — Google searching news articles, papers, and reviews on the topic. However, it is often difficult to get a bird’s eye view of the full discussion around the topic, with pros and cons of each side clearly separated - thus making students spend an disproportionate amount of time doing extensive digging until they find the sources with the right stances that they need instead of actual quality time writing and revising their paper.
+      </p>
+      <p>
+        Pulse is a Google Chrome extension for previewing Google News article sentiment. Using Pulse, users can type a controversial topic into Google News and easily see red, green, or gray labels for each article indicating which articles advocate for similar stances. This application will allow users to gain a clearer picture of the discussion happening around the topic and will especially help students who are trying to gather sources from multiple viewpoints for their argumentative essays. Now, for example, when writing a paper on why marijuana should be legalized, a student can just search the topic on Google News and look for the green labels next to each result indicating a positive sentiment. Gone are the days of clicking through each search result and struggling through an endless amount of articles!
+      </p>
+      
+      <!-- ============= System Design ============= -->
+      <h3>System Design</h3>
+      <p>
+        Pulse’s Google Chrome extension system includes three components: a lightweight frontend, a ML-powered backend, and a logging system for a user feedback flywheel.
+      </p>
+      <div class="systems">
+        <div class="system">
+          <img class="system-img" src="assets/chrome.png">
+          <br>
+          Chrome Extension
+        </div>
+        <div class="system">
+          <img class="system-img" src="assets/hugging-face.png">
+          <br>
+          DistilBERT ML model
+        </div>
+        <div class="system">
+          <img class="system-img" src="assets/logging.png">
+          <br>
+          logging system
+        </div>
+      </div>
+      <h4>Frontend</h4>
+      <p>
+        From the user’s perspective, Pulse is a lightweight Chrome extension that makes little to no difference to the overall layout and structure of the normal Google News search engine. Users can activate result labeling by flipping a switch on the small Pulse extension pop up on a Google News search page. After the switch is flipped, small non-intrusive red and green labels are displayed next to each news article indicating positive or negative (or gray for neutral) sentiment towards the original search query. This minimalist design was chosen by our goal of not distracting the user from the actual Google News search results and giving users the ability to easily turn the labeling functionality on and off whenever they wanted to. When the switch is flipped, each Google News article title and snippet are passed as strings to our backend which in returns the correct labeling for that result. Our frontend design also includes a user feedback interface where a user can provide a correct label for any result (whether the result was actually correct or incorrect) which is then fed into our logging system.
+      </p>
+      <h4>Backend</h4>
+      <p>
+        Our backend provides a correct positive, negative, or neutral sentiment labeling for a given article title and article snippet. This prediction is made using a Hugging Face DistilBERT model pretrained on a Hugging Face dataset which is described later in the Machine Learning section of this post. The model is set up as a basic Flask app which communicates with the frontend through GET requests. Flask was chosen as our backend technology to simplify the process of getting an API endpoint up and running quickyl. We tried deploying our app on GCP but unfortunately ended up with many exceeded memory errors, which we were not able to resolve.
+      </p>
+      <h4>Logging</h4>
+      <p>
+        Finally, our logging system serves to incorporate user feedback as training data for the model to create a user feedback data flywheel. The user feedback information is first sent to the logging system from our frontend feedback interface which is then stored in a simple <code>.csv</code> file on our backend. Then, our model on the backend is retrained periodically every day using the new data from the <code>.csv</code> file. This allows us to simulate a feedback flywheel effect similar to Tesla’s Autopilot system by retraining the model on wrong predictions. Over time, with more users and more correct feedback, we can slowly phase out these wrong predictions and increase the accuracy of our predictions.
+      </p>
+      <p>
+        In all, we designed Pulse’s three system components (frontend, backend, and logging) to be as lightweight as possible because we envision Pulse as simply an extra non-distracting extension students can use while doing research for a term paper or project. We believe that making Pulse any more complicated or adding unnecessary features would simply distract the user from their actual research and make the experience less seamless for the user. With a minimalist and efficient tool like Pulse, we believe we can provide an important research functionality to students while still letting them put focus towards their actual paper.
+      </p>
+      
+      <!-- ============= Machine Learning Component ============= -->
+      <h3>Machine Learning Component</h3>
+      <p>
+        We started by finding a dataset for our problem and came across the PerSenT dataset on Hugging Face. The data consists of a few thousand articles with their titles and up to first 16 paragraphs, all labeled for their sentiment using Amazon Mechanical Turk.
+      </p>
+      <p>
+        To set a couple baselines, we started with a GloVE vectorizer and a logistic regression model just reporting back positive and negative classifications. Then we moved on to an SVM model on top a tf-idf vectorizer with positive, neutral, and negative classes. None of these options did much better than random chance when measured using Scikit-learn's <code>balanced_accuracy_score</code>.
+      </p>
+      <p>
+        It seemed that the models were only learning to predict positive, since that was the most prevalent class in the training data, so to establish a better baseline, we decided to use the NLTK package's VADER sentiment analysis tool instead. This is a rule-based algorithm that has words and sentence structures annotated for polarity. This approach still only showed negligibly better performance than the previous two. We realized by looking at the data that very few entries in the dataset were reported to be neutral. So to test this theory, we just restricted the threshold for reporting neutral to 90%. After finding a suitable threshold using the training and validation data, we saw balanced accuracy rise from 34% to 40% on the test set.
+      </p>
+      <p>
+        We deployed this VADER model and found that it performed well in the real application. We have not been able to systematically confirm this yet, but this led us to suspect that the dataset itself was not annotated in a way that seemed to match our expectations of the real system. We suspect that the dataset labels positive or negative sentiments too aggressively, and in some cases it seems that prior knowledge of the issue biased the label. As an example, “Thoughts on Racism” might be a neutral title if you didn’t know what racism is, but given our recent political history a person might guess the article condemns recent acts of racial violence and would label it as a negative title.
+      </p>
+      <p>
+        Eventually, we switched to a DistilBERT model. This was fine-tuned on our data after initially training on the SST2 sentiment analysis dataset. This model is discussed further in the evaluation section.
+      </p>
+      
+      <!-- ============= System Evaluation ============= -->
+      <h3>System Evaluation</h3>
+      <p>
+        For evaluating the performance of Pulse, we tested each system component individually in addition to the application as a whole. We now go in depth into each component’s testing.
+      </p>
+      <h4>Frontend</h4>
+      <p>
+        For the frontend component, the main challenge was being able to quickly add red, green, or gray labels to any Google News search result at the click of a button. This challenge was relatively easy to test through trying many different news queries and clicking the label button and evaluating if colored labels could appear next to each search result in a timely manner. Another part of our evaluation also included tinkering around and making sure that the design of our labels was not too intrusive as to distract from the actual search results. We went through several iterations until we achieved the ideal minimal user experience.
+      </p>
+      <h4>Backend</h4>
+      <p>
+        For the backend component, the main challenge was being able to generate a correct classification given a title and article snippet. In this regard, evaluating our backend component meant evaluating our model performance. To do this, we regularly evaluated our model performance with a series of metrics on our dataset including accuracy, precision, recall, confusion matrices, F1 score, etc. We adjusted our model training and parameters accordingly. In addition, we did random sanity checks on our model by feeding a sample article title and snippet from Google News that was clearly positive or negative and observing the output. This turned out to be extremely useful in our development as we had noticed often the model would predict always positive or always negative in some cases.
+      </p>
+      <p>
+        We started with a DistilBERT model fine-tuned on the SST2 dataset. Without this approach, training from scratch was unideal since we did not have enough data and the model was just predicting positive with 0.99 confidence on everything. The SST2 model initially had 65% balanced accuracy but poor calibration (positive class is shown below to demonstrate). After one epoch of fine-tuning, accuracy dropped on the testing set to 54%, but the calibration was much improved. Our final test was with 5 epochs of fine-tuning. Although the test set accuracy went up to 60%, calibration was negatively impacted once more. Therefore we decided to use the version fine tuned on just one epoch, since we did suspect there might be underlying issues with the dataset. We knew we could trust the confidence level emitted by the algorithm a bit more in this case.
+      </p>
+      <div class="plots">
+        <div class="plot">
+          <img class="plot-img" src="assets/sst2.png">
+          SST2
+        </div>
+        <div class="plot">
+          <img class="plot-img" src="assets/1_epoch.png">
+          1 Epoch
+        </div>
+        <div class="plot">
+          <img class="plot-img" src="assets/5_epochs.png">
+          5 Epochs
+        </div>
+      </div>
+      <h4>Logging</h4>
+      <p>
+        For the logging component, the main challenge was being able to log user feedback from the frontend component and use it again in our retraining flywheel. To test the actual user feedback logging, we simply ran a couple of news queries and checked whether clicking the user feedback button caused the feedback appeared on the <code>.txt</code> file on our backend. Evaluating the retraining flywheel was a little more difficult. To test, we logged a couple of user feedback data points from our frontend and then printed out our dataset to double check that our new data points were present.
+      </p>
+      <h4>Holistic</h4>
+      <p>
+        Evaluating Pulse on a system-level required putting all three components together and verifying that the behavior of the Chrome Extension was correct. This included checking that our sentiment labels still appeared next to each result on a button click and that the labels were displaying the correct sentiment. Performance testing then included trying out dozens of news queries, manually counting the number of correct and incorrect labels, and seeing if the statistics lined up with our statistics in the individual component testing.
+      </p>
+      
+      <!-- ============= Application Demonstration ============= -->
+      <h3>Application Demonstration</h3>
+      <p>
+        Below is an animated GIF of Pulse in action. For each search result, Pulse puts a red, gray, or green label. The user can also provide feedback on each article, whether the result is correct or not. Notice how the labels appear almost immediately, providing a great user experience.
+      </p>
+      <div class="gif">
+        <img src="assets/pulse.gif">
+      </div>
+      
+      <!-- ============= Reflection ============= -->
+      <h3>Reflection</h3>
+      <p>
+        Working on Pulse was an extremely fun and challenging endeavor that our entire group learned a lot from.
+      </p>
+      <p>
+        We were very pleased with our design decision on all three components of the extension. We were able to implement our frontend design just the way we wanted to, with a small non-intrusive colored label next to each Google News search result as well as parse the article titles and snippets. We think our choice of tech stack worked very well for our application also, as using Flask with Python allowed us to create a simple API backend that utilizes a popular Hugging Face model. We also are proud that we were able to incorporate a user feedback flywheel into our extension as Pulse is a great application for it and continually makes our product better.
+      </p>
+      <p>
+        There were a few things that didn’t work however. Picking and training a model turned out to be extremely difficult, as there were little to no public datasets available that closely matched our task. Very often we found that the models we had did not work properly (e.g. always outputing the same sentiment). We had to try out many different models on Scikit-learn and Hugging Face as well as different datasets until we found one that achieved somewhat reasonable performance. Next time when working on a similar project, we would likely put more initial time into building and developing a solid model first before building the other components around it.
+      </p>
+      <p>
+        There are a couple features that we would love to add with unlimited time and resources. With more time we would definitely figure out why we were using too much memory and deploy our model to GCP. One cool feature would be to be able to physically separate the Google News search results based on their sentiment instead of providing a colored label, which would make seeing the bird’s eye overview of the discussion even easier for the user. We’d also like to develop a “find similar articles” feature where you could find similar opinion articles based on a sentiment of one article, which would help immensely in researching specific topics. There are even more that we had in mind, but we would also like to note that we were wary about adding too many features to the application because we wanted to keep Pulse as lightweight as possible.
+      </p>
+      <p>
+        Our future plans with this application are currently unclear, but the extension is currently published on the Google Chrome extension store for beta testing and later for the general public to use!
+      </p>
+
+      <!-- ============= Broader Impacts ============= -->
+      <h3>Broader Impacts</h3>
+      <p>
+        Performing classification tasks on news articles are always tricky because of the subjective nature of news articles in general. In particular, questions arise such as what exactly does it mean for a news article to have a positive sentiment or a negative sentiment? Does a news article with a positive sentiment always mean that it argues against a similar news article with a negative sentiment? Every user will have a different answer to these questions and a different interpretation of positive and negative sentiments in general. We chose to address this by incorporating a user feedback loop into our application. By including the ability for users to input their own interpretations of positive and negative news articles, we can continually retrain and improve our product with enough users so that our model takes into account not just include our own interpretation but “everyone’s” interpretations.
+      </p>
+      <p>
+        Another area of concern that continually comes up on the topic of news is the spread of misinformation and “fake news.” Unfortunately, Pulse simply classifies every article on Google News based on their title and article snippet and has no indication of how trustworthy the source or article itself is. This could lead to potential problems with our product by pushing users towards certain articles (e.g. if a user was looking for an anti-abortion article but most of anti-abortion articles on Google News are unsubstantiated or unsupported). However, we strongly hope that with plenty of discussion around fake news, there will be more Chrome extension-like tools that specifically target disinformation around search results that users might be able to use in conjunction with Pulse.
+      </p>
+
+      <!-- ============= References ============= -->
+      <h3>References</h3>
+        <ol>
+          <li>
+            <a href="https://Hugging Face.co/transformers/model_doc/distilbert.html" target="_blank" class="reference">
+              Hugging Face - DistilBERT
+            </a>
+          </li>
+          <li>
+            <a href="https://huggingface.co/datasets/per_sent" target="_blank" class="reference">
+              Hugging Face - PerSenT
+            </a>
+          </li>
+          <li>
+            <a href="https://www.kaggle.com/atulanandjha/stanford-sentiment-treebank-v2-sst2" target="_blank" class="reference">
+              Kaggle - Stanford Sentiment Treebank v2 (SST2)
+            </a>
+          </li>
+          <li>
+            <a href="https://www.nltk.org/_modules/nltk/sentiment/vader.html" target="_blank" class="reference">
+              NLTK - VADER
+            </a>
+          </li>
+          <li>
+            <a href="https://www.youtube.com/watch?v=Ipa58NVGs_c" target="_blank" class="reference">
+              YouTube - How to Make Chrome Extensions
+            </a>
+          </li>
+        </ol>
+    </section>
+  </section>
+  <section class="footer">
+    Pulse
+  </section>
+</body>
+</html>
+
+
+
+<!-- TODO: topbar with Stanford CS 329S -->
